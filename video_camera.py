@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture(0)
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
@@ -16,7 +16,7 @@ while True:
         break
 
     # Our operations on the frame come here
-    #gray = cv.cvtColor(frame, cv.COLOR_BGR)
+    #frame = cv.cvtColor(frame, cv.COLOR_BGR2YUV)
     
     # Display the resulting frame
     cv.imshow('frame', frame)
