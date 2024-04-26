@@ -1,14 +1,17 @@
-import cv2 
+import cv2 as cv
+import os
 
 # Load the image
-image = cv2.imread("C:\\Users\\Hamish\\Documents\\Bachelor_Thesis\\opencv_test\\left01.jpg")
+absolute_path = os.path.join(os.getcwd(), 'image_data', 'lena.jpg')
+print(os.path.isfile(absolute_path))
+image = cv.imread(absolute_path)
 print(image)
 
 # Display the image
-cv2.imshow("Image", image)
+cv.imshow("Image", image)
 
 # Wait for the user to press a key
-cv2.waitKey(0)
+cv.waitKey(0)
 
 # Close all windows
-cv2.destroyAllWindows()
+cv.destroyAllWindows()

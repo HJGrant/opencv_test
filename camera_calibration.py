@@ -1,6 +1,7 @@
 import numpy as np 
 import cv2 as cv
 import glob2 as glob
+import os
 
 # termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -13,18 +14,15 @@ objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
-images = glob.glob("C:\\Users\\Hamish\\Documents\\Bachelor_Thesis\\opencv_test\\*.jpg")
-#print(images)
-
+images = glob.glob(os.path.join(os.getcwd(), 'image_data', '*.jpg'))
 
 for fname in images:
-    print(fname)
     img = cv.imread(fname)
-    print(img)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
 # Find the chess board corners
 ret, corners = cv.findChessboardCorners(gray, (7,6), None)
+
 
 # If found, add object points, image points (after refining them)
 if ret == True:
@@ -39,3 +37,29 @@ cv.imshow('img', img)
 cv.waitKey(500)
 
 cv.destroyAllWindows()
+
+#get distortion coefficients, camera matrix, rotation and translation vectors etc.
+ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+
+#get image and refine the camera matrix, either add extra black pixels to image or remove disorted pixels from the final image file
+img = cv.imread(os.path.join(os.getcwd(), 'image_data', 'left12.jpg'))
+h, w = img.shape[:2]
+newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+
+# undistort
+dst = cv.undistort(img, mtx, dist, None, newcameramtx)
+ 
+# crop the image
+x, y, w, h = roi
+dst = dst[y:y+h, x:x+w]
+cv.imwrite('calibresult.png', dst)
+
+#save multiple arrays with np.savez()
+np.savez('camera_parameters', mtx=mtx, dist=dist)
+data = np.load("camera_parameters.npz")
+
+#read data by accesing via keyword argument
+mtx1 = data['mtx']
+dst1 = data['dist']
+
+data.close()
