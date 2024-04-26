@@ -1,7 +1,7 @@
 import cv2 
 
 # Load the image
-image = cv2.imread("C:\\Users\\Hamish\\Documents\\Bachelor_Thesis\\opencv_test\\left01.jpg")
+image = cv2.imread(".\\image_data\\left01.jpg")
 print(image)
 
 # Display the image
