@@ -55,7 +55,7 @@ dst = dst[y:y+h, x:x+w]
 cv.imwrite('calibresult.png', dst)
 
 #save multiple arrays with np.savez()
-np.savez('camera_parameters', mtx=mtx, dist=dist)
+np.savez('B', mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)
 data = np.load("camera_parameters.npz")
 
 #read data by accesing via keyword argument
