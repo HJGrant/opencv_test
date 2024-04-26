@@ -1,4 +1,5 @@
 #code from Paul McWhorters youtube video series on AI with the Jetson Nano
+#file I used for lessons 11, 12 and 13
 
 import cv2
 print(cv2.__version__)
