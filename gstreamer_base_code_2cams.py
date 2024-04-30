@@ -32,22 +32,32 @@ def __gstreamer_pipeline(
     )
 
 #initialise video capture object   
-cam = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
+cam1 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
+cam2 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=1, flip_method=0), cv2.CAP_GSTREAMER)
 
 #check if video capture object was properly initialised and able to open
-if not cam.isOpened():
+if not cam1.isOpened():
  print("Cannot open camera 1")
  exit()
 
+if not cam2.isOpened():
+ print("Cannot open camera 2")
+ exit()
+
+
 #Main loop
 while True:
-    ret1, frame = cam.read()
-    cv2.imshow('FRAMOS',frame)
-    cv2.moveWindow('FRAMOS', 0, 0)
+    ret1, frame1 = cam1.read()
+    ret2, frame2 = cam2.read()
+    cv2.imshow('FRAMOS1',frame1)
+    cv2.imshow('FRAMOS2', frame2)
+    cv2.moveWindow('FRAMOS1', 0, 250)
+    cv2.moveWindow('FRAMOS2', 1100, 250)
 
     if cv2.waitKey(1)==ord('q'):
         break
 
 #close video capture object and close opencv window   
-cam.release()
+cam1.release()
+cam2.release()
 cv2.destroyAllWindows()
