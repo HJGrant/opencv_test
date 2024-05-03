@@ -3,6 +3,35 @@ import cv2 as cv
 import glob2 as glob
 import os
 
+def __gstreamer_pipeline(
+        camera_id,
+        capture_width=1920,
+        capture_height=1080,
+        display_width=1920/2,
+        display_height=1080/2,
+        framerate=30,
+        flip_method=0,
+    ):
+    return (
+            "nvarguscamerasrc sensor-id=%d ! "
+            "video/x-raw(memory:NVMM), "
+            "width=(int)%d, height=(int)%d, "
+            "format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "nvvidconv flip-method=%d ! "
+            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+            "videoconvert ! "
+            "video/x-raw, format=(string)BGR ! appsink max-buffers=1 drop=True"
+            % (
+                    camera_id,
+                    capture_width,
+                    capture_height,
+                    framerate,
+                    flip_method,
+                    display_width,
+                    display_height,
+            )
+    )
+
 # termination criteria
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -15,6 +44,8 @@ objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
 images = glob.glob(os.path.join(os.getcwd(), 'image_data', '*.jpg'))
+
+
 
 for fname in images:
     img = cv.imread(fname)

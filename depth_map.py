@@ -1,8 +1,8 @@
 import cv2
-print(cv2.__version__)
+import numpy as np
+from matplotlib import pyplot as plt
 
-#funciton for defining the gstreamer pipelin string
-#Note: you may need to find a setting here to set the latency of gstreamer to 0
+#function for defining the gstreamer string
 def __gstreamer_pipeline(
         camera_id,
         capture_width=1920,
@@ -33,32 +33,34 @@ def __gstreamer_pipeline(
     )
 
 #initialise video capture object   
-cam1 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=1, flip_method=0), cv2.CAP_GSTREAMER)
-cam2 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
+cam1 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
+cam2 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=1, flip_method=0), cv2.CAP_GSTREAMER)
 
-#check if video capture object was properly initialised and able to open
-if not cam1.isOpened():
- print("Cannot open camera 1")
- exit()
+#read one frame from each camera and convert to grayscale
+ret1, frame1 = cam1.read()
+ret2, frame2 = cam2.read()
+frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-if not cam2.isOpened():
- print("Cannot open camera 2")
- exit()
-
-
-#Main loop
+#display both frames
 while True:
-    ret1, frame1 = cam1.read()
-    ret2, frame2 = cam2.read()
-    cv2.imshow('FRAMOS1',frame1)
-    cv2.imshow('FRAMOS2', frame2)
-    cv2.moveWindow('FRAMOS1', 0, 250)
-    cv2.moveWindow('FRAMOS2', 1100, 250)
+        cv2.imshow('FRAMOS1',frame1)
+        cv2.imshow('FRAMOS2', frame2)
+        cv2.moveWindow('FRAMOS1', 0, 250)
+        cv2.moveWindow('FRAMOS2', 1100, 250)
 
-    if cv2.waitKey(1)==ord('q'):
-        break
+        if cv2.waitKey(1)==ord('q'):
+                break
 
-#close video capture object and close opencv window   
 cam1.release()
 cam2.release()
 cv2.destroyAllWindows()
+
+stereo = cv2.StereoBM.create(numDisparities=32, blockSize=15)
+disparity = stereo.compute(frame1, frame2)
+fig1 = plt.figure(figsize=(1,2))
+fig1.add_subplot(1,2, 1)
+plt.imshow(disparity, 'gray')
+fig1.add_subplot(1,2, 2)
+plt.imshow(frame1,'gray')
+plt.show()
