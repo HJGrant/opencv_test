@@ -2,6 +2,7 @@ import cv2
 print(cv2.__version__)
 
 #funciton for defining the gstreamer pipelin string
+#Note: you may need to find a setting here to set the latency of gstreamer to 0
 def __gstreamer_pipeline(
         camera_id,
         capture_width=1920,
