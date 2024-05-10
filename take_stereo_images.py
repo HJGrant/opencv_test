@@ -48,7 +48,7 @@ if not cam2.isOpened():
 
 
 #Main loop
-index = 12
+index = 0
 while True:
     ret1, frame1 = cam1.read()
     ret2, frame2 = cam2.read()

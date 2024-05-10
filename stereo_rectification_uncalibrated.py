@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
-from gstreamer.gstreamer_base_code import __gstreamer_pipeline
 import matplotlib.pyplot as plt
-print(cv2.__version__)
 
 def drawlines(img1src, img2src, lines, pts1src, pts2src):
     ''' img1 - image on which we draw the epilines for the points in img2
@@ -86,45 +84,3 @@ def stereo_rectification_uncalibrated(leftFrame, rightFrame):
     rightFrameRect = cv2.warpPerspective(rightFrame, H2, (w2, h2))
 
     return H1, H2
-
-#initialise video capture object   
-cam1 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=1, flip_method=0), cv2.CAP_GSTREAMER)
-cam2 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
-
-#check if video capture object was properly initialised and able to open
-if not cam1.isOpened():
- print("Cannot open camera 1")
- exit()
-
-if not cam2.isOpened():
- print("Cannot open camera 2")
- exit()
-
-#read 2 images in order ot get dimensions and compute first homography matrix
-img1 = cv2.imread("img_data/left_image_1.jpg", cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread("img_data/right_image_1.jpg", cv2.IMREAD_GRAYSCALE)
-
-#Main loop
-h1, w1 = img1.shape
-h2, w2 = img2.shape
-H1, H2 = stereo_rectification_uncalibrated(img1, img2)
-
-while True:
-    ret1, frame1 = cam1.read()
-    ret2, frame2 = cam2.read()
-
-    left_frame_rectified = cv2.warpPerspective(frame1, H1, (w1, h1))
-    right_frame_rectified = cv2.warpPerspective(frame2, H2, (w2, h2))
-
-    cv2.imshow('LEFT FRAME',left_frame_rectified)
-    cv2.imshow('RIGH FRAME', right_frame_rectified)
-    cv2.moveWindow('LEFT FRAME', 100, 250)
-    cv2.moveWindow('RIGHT FRAME', 1100, 250)
-     
-    if cv2.waitKey(1)==ord('q'):
-        break
-
-#close video capture object and close opencv window   
-cam1.release()
-cam2.release()
-cv2.destroyAllWindows()
