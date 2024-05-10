@@ -1,4 +1,5 @@
 import cv2
+from time import sleep, time
 print(cv2.__version__)
 
 #funciton for defining the gstreamer pipelin string
@@ -47,16 +48,41 @@ if not cam2.isOpened():
 
 
 #Main loop
+index = 0
+delay = 5
 while True:
-    ret1, frame1 = cam1.read()
-    ret2, frame2 = cam2.read()
-    cv2.imshow('FRAMOS1',frame1)
-    cv2.imshow('FRAMOS2', frame2)
-    cv2.moveWindow('FRAMOS1', 0, 250)
-    cv2.moveWindow('FRAMOS2', 1100, 250)
+        ret1, frame1 = cam1.read()
+        ret2, frame2 = cam2.read()
+        cv2.imshow('FRAMOS1',frame1)
+        cv2.imshow('FRAMOS2', frame2)
+        cv2.moveWindow('FRAMOS1', 0, 250)
+        cv2.moveWindow('FRAMOS2', 1100, 250)
 
-    if cv2.waitKey(1)==ord('q'):
-        break
+        keyEvent = cv2.waitKey(1)
+
+        if keyEvent == ord('i'):
+                sleep(0.5)
+                cv2.imwrite('img_data/left_image_'+str(index)+'.jpg', frame1)
+                cv2.imwrite('img_data/right_image_'+str(index)+'.jpg', frame2)
+                index += 1
+
+        #take a delayed picture, 
+        if keyEvent == ord('d'):
+                start = time()
+                while time()- start <= delay:
+                        ret1, frame1 = cam1.read()
+                        ret2, frame2 = cam2.read()
+                        cv2.imshow('FRAMOS1',frame1)
+                        cv2.imshow('FRAMOS2', frame2)
+                        cv2.moveWindow('FRAMOS1', 0, 250)
+                        cv2.moveWindow('FRAMOS2', 1100, 250)
+
+                cv2.imwrite('img_data/left_image_'+str(index)+'.jpg', frame1)
+                cv2.imwrite('img_data/right_image_'+str(index)+'.jpg', frame2)
+                index += 1
+
+        if keyEvent==ord('q'):
+                break
 
 #close video capture object and close opencv window   
 cam1.release()
