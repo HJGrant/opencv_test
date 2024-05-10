@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from gstreamer.gstreamer_base_code_2cams import __gstreamer_pipeline
+from gstreamer.gstreamer_base_code import __gstreamer_pipeline
 import matplotlib.pyplot as plt
 print(cv2.__version__)
 
