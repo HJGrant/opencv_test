@@ -94,25 +94,27 @@ if not cam2.isOpened():
  print("Cannot open camera 2")
  exit()
 
-#read first frame and get parameters
-ret1, frame1 = cam1.read()
-ret2, frame2 = cam2.read()
-h1, w1 = frame1.shape
-h2, w2 = frame2.shape
-
-#compute homography matrices from first two frames
-H1, H2 = stereo_rectification_uncalibrated(frame1, frame1)
+#read 2 images in order ot get dimensions and compute first homography matrix
+img1 = cv2.imread("img_data/left_image_1.jpg", cv2.IMREAD_GRAYSCALE)
+img2 = cv2.imread("img_data/right_image_1.jpg", cv2.IMREAD_GRAYSCALE)
 
 #Main loop
+h1, w1 = img1.shape
+h2, w2 = img2.shape
+H1, H2 = stereo_rectification_uncalibrated(img1, img2)
+
 while True:
     ret1, frame1 = cam1.read()
     ret2, frame2 = cam2.read()
-    frame1, frame2 = stereo_rectification_uncalibrated(frame1, frame2)
-    cv2.imshow('FRAMOS1',frame1)
-    cv2.imshow('FRAMOS2', frame2)
-    cv2.moveWindow('FRAMOS1', 0, 250)
-    cv2.moveWindow('FRAMOS2', 1100, 250)
 
+    left_frame_rectified = cv2.warpPerspective(frame1, H1, (w1, h1))
+    right_frame_rectified = cv2.warpPerspective(frame2, H2, (w2, h2))
+
+    cv2.imshow('LEFT FRAME',left_frame_rectified)
+    cv2.imshow('RIGH FRAME', right_frame_rectified)
+    cv2.moveWindow('LEFT FRAME', 100, 250)
+    cv2.moveWindow('RIGHT FRAME', 1100, 250)
+     
     if cv2.waitKey(1)==ord('q'):
         break
 
