@@ -1,37 +1,10 @@
 import cv2
 import numpy as np
+from .helpers.gstreamer_base_code_2cams import __gstreamer_pipeline
 print(cv2.__version__)
 
 #funciton for defining the gstreamer pipelin string
 #Note: you may need to find a setting here to set the latency of gstreamer to 0
-def __gstreamer_pipeline(
-        camera_id,
-        capture_width=1920,
-        capture_height=1080,
-        display_width=1920/2,
-        display_height=1080/2,
-        framerate=30,
-        flip_method=0,
-    ):
-    return (
-            "nvarguscamerasrc sensor-id=%d ! "
-            "video/x-raw(memory:NVMM), "
-            "width=(int)%d, height=(int)%d, "
-            "format=(string)NV12, framerate=(fraction)%d/1 ! "
-            "nvvidconv flip-method=%d ! "
-            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
-            "videoconvert ! "
-            "video/x-raw, format=(string)BGR ! appsink max-buffers=1 drop=True"
-            % (
-                    camera_id,
-                    capture_width,
-                    capture_height,
-                    framerate,
-                    flip_method,
-                    display_width,
-                    display_height,
-            )
-    )
 
 def stereo_rectification_uncalibrated(leftFrame, rightFrame):
     sift = cv2.SIFT_create()
