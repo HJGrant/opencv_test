@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from gstreamer.gstreamer_base_code_2cams import __gstreamer_pipeline
+import matplotlib.pyplot as plt
 print(cv2.__version__)
 
 def drawlines(img1src, img2src, lines, pts1src, pts2src):
