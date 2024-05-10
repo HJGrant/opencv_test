@@ -1,10 +1,42 @@
 import cv2
 import numpy as np
-from .helpers.gstreamer_base_code_2cams import __gstreamer_pipeline
+from gstreamer.gstreamer_base_code_2cams import __gstreamer_pipeline
 print(cv2.__version__)
 
-#funciton for defining the gstreamer pipelin string
-#Note: you may need to find a setting here to set the latency of gstreamer to 0
+def drawlines(img1src, img2src, lines, pts1src, pts2src):
+    ''' img1 - image on which we draw the epilines for the points in img2
+        lines - corresponding epilines '''
+    r, c = img1src.shape
+    img1color = cv2.cvtColor(img1src, cv2.COLOR_GRAY2BGR)
+    img2color = cv2.cvtColor(img2src, cv2.COLOR_GRAY2BGR)
+    # Edit: use the same random seed so that two images are comparable!
+    np.random.seed(0)
+    for r, pt1, pt2 in zip(lines, pts1src, pts2src):
+        color = tuple(np.random.randint(0, 255, 3).tolist())
+        x0, y0 = map(int, [0, -r[2]/r[1]])
+        x1, y1 = map(int, [c, -(r[2]+r[0]*c)/r[1]])
+        img1color = cv2.line(img1color, (x0, y0), (x1, y1), color, 1)
+        img1color = cv2.circle(img1color, tuple(pt1), 5, color, -1)
+        img2color = cv2.circle(img2color, tuple(pt2), 5, color, -1)
+    return img1color, img2color
+
+def show_epilines(img1, img2, fundamental_matrix, pts1, pts2):
+    lines1 = cv2.computeCorrespondEpilines(
+    pts2.reshape(-1, 1, 2), 2, fundamental_matrix)
+    lines1 = lines1.reshape(-1, 3)
+    img5, img6 = drawlines(img1, img2, lines1, pts1, pts2)
+
+    # Find epilines corresponding to points in left image (first image) and
+    # drawing its lines on right image
+    lines2 = cv2.computeCorrespondEpilines(
+    pts1.reshape(-1, 1, 2), 1, fundamental_matrix)
+    lines2 = lines2.reshape(-1, 3)
+    img3, img4 = drawlines(img2, img1, lines2, pts2, pts1)
+
+    plt.subplot(121), plt.imshow(img5)
+    plt.subplot(122), plt.imshow(img3)
+    plt.suptitle("Epilines in both images")
+    plt.show()
 
 def stereo_rectification_uncalibrated(leftFrame, rightFrame):
     sift = cv2.SIFT_create()
