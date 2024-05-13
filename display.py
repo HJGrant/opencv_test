@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 from gstreamer.gstreamer_base_code import __gstreamer_pipeline
 from stereo_rectification_calibrated import stereo_rectification_calibrated
 from stereo_rectification_uncalibrated import stereo_rectification_uncalibrated
@@ -53,7 +54,10 @@ while True:
     right_frame_rectified = right_frame_rectified[ROI2[1]:ROI2[3], ROI2[0]:ROI2[2]]
 
     #create a depth map based on the rectified images
+    start = time.time()
     disparity = depth_map(left_frame_rectified, right_frame_rectified)
+    end = time.time()
+    print(end-start)
 
 
     cv2.imshow('LEFT FRAME UDIST',left_frame_rectified)
