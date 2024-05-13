@@ -3,6 +3,7 @@ import vpi
 import numpy as np
 
 def vpi_stereo(left_frame, right_frame):
+    #set the max disparities in the disparity map
     max_disp = 256
 
     #convert images to graysale 
@@ -34,4 +35,5 @@ def vpi_stereo(left_frame, right_frame):
     #with disparity.rlock_cpu() as data:
     #    mtx = data
 
+    #return the color disparity map
     return disparityColor
