@@ -6,6 +6,7 @@ from stereo_rectification_calibrated import stereo_rectification_calibrated
 from stereo_rectification_uncalibrated import stereo_rectification_uncalibrated
 from undistort_only import undistort_only
 from depth_map import depth_map
+from vpi_depth_map import vpi_stereo
 import matplotlib.pyplot as plt
 print(cv2.__version__)
 
@@ -55,9 +56,11 @@ while True:
 
     #create a depth map based on the rectified images
     start = time.time()
-    disparity = depth_map(left_frame_rectified, right_frame_rectified)
+    #disparity = depth_map(left_frame_rectified, right_frame_rectified)
+    disparity = vpi_stereo(left_frame_rectified, right_frame_rectified)
     end = time.time()
-    print(end-start)
+    #print(end-start)
+
 
 
     cv2.imshow('LEFT FRAME UDIST',left_frame_rectified)
@@ -65,7 +68,7 @@ while True:
     cv2.imshow('DISPARITY', disparity)
     cv2.moveWindow('LEFT FRAME UDIST', 100, 250)
     cv2.moveWindow('RIGHT FRAME UDIST', 1100, 250)
-    cv2.moveWindow('DISPARITY', 100, 950)
+    cv2.moveWindow('DISPARITY', 100, 850)
      
     if cv2.waitKey(1)==ord('q'):
         break
