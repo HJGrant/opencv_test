@@ -6,45 +6,67 @@ print(cv2.__version__)
 #Note: you may need to find a setting here to set the latency of gstreamer to 0
 def __gstreamer_pipeline(
         camera_id,
-        capture_width=1920,
-        capture_height=1080,
-        display_width=1920/2,
-        display_height=1080/2,
+        sensor_mode=4,          #3856x2180 and 90fps
+        capture_width=3856,
+        capture_height=2180,
+        display_width=1920,
+        display_height=1080,
         framerate=30,
         flip_method=0,
+        tnr_mode=1,                     #2=NoiseReduction_HighQualit, 1=NoiseReduction_Fast, 0=NoiseReduction_Off
+        tnr_strength=1,                 #Noise Reduction Strength, Range: -1 to 1
+        white_balance=4,                #
+        exposure_compensation=-1.5,          #Range: -2 and 2
+        brightness=-0.05,                #Range: -1 to 1 
+        contrast=1.5,                     #Range: 0 to 2
+        saturation=1.5,                   #Range: 0 to 2 
+        hue=0.05                          #Range -1 to 1
     ):
     return (
-            "nvarguscamerasrc sensor-id=%d ! "
+            "nvarguscamerasrc sensor-id=%d sensor-mode=%d tnr_mode=%d tnr_strength=%f wbmode=%d exposurecompensation=%f ! "
             "video/x-raw(memory:NVMM), "
-            "width=(int)%d, height=(int)%d, "
-            "format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "width=(int)%d, height=(int)%d,"
+            "format=(string)NV12 ! "
             "nvvidconv flip-method=%d ! "
             "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
             "videoconvert ! "
-            "video/x-raw, format=(string)BGR ! appsink max-buffers=1 drop=True"
+            "video/x-raw, format=(string)BGR ! "
+            "videobalance brightness=%f contrast=%f saturation=%d hue=%f ! "
+            "appsink "
             % (
                     camera_id,
+                    sensor_mode,
+                    tnr_mode,
+                    tnr_strength,
+                    white_balance,
+                    exposure_compensation,
                     capture_width,
                     capture_height,
-                    framerate,
                     flip_method,
                     display_width,
                     display_height,
+                    brightness,
+                    contrast,
+                    saturation,
+                    hue,
+
             )
     )
 
 #initialise video capture object   
+camSet = 'nvarguscamerasrc sensor-id=0 sensor-mode=4 wbmode=2 ! video/x-raw(memory:NVMM),width=3856,height=2180 ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! video/x-raw,format=BGR ! appsink'
 cam1 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=1, flip_method=0), cv2.CAP_GSTREAMER)
-cam2 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
+#cam1 = cv2.VideoCapture(camSet, cv2.CAP_GSTREAMER)
+#cam2 = cv2.VideoCapture(__gstreamer_pipeline(camera_id=0, flip_method=0), cv2.CAP_GSTREAMER)
 
 #check if video capture object was properly initialised and able to open
 if not cam1.isOpened():
  print("Cannot open camera 1")
  exit()
 
-if not cam2.isOpened():
- print("Cannot open camera 2")
- exit()
+#if not cam2.isOpened():
+# print("Cannot open camera 2")
+# exit()
 
 
 #Main loop
@@ -52,39 +74,23 @@ index = 0
 delay = 5
 while True:
         ret1, frame1 = cam1.read()
-        ret2, frame2 = cam2.read()
-        cv2.imshow('FRAMOS1',frame1)
-        cv2.imshow('FRAMOS2', frame2)
-        cv2.moveWindow('FRAMOS1', 0, 250)
-        cv2.moveWindow('FRAMOS2', 1100, 250)
+        #ret2, frame2 = cam2.read()
+
+        frame1 = cv2.resize(frame1, (960, 540))
+        #frame2 = cv2.resize(frame2, (960, 540))
+
+        cv2.imshow('FRAMOS1', frame1)
+        #cv2.imshow('FRAMOS2', frame2)
+        cv2.moveWindow('FRAMOS1', 100, 250)
+        #cv2.moveWindow('FRAMOS2', 1100, 250)
+        
 
         keyEvent = cv2.waitKey(1)
-
-        if keyEvent == ord('i'):
-                sleep(0.5)
-                cv2.imwrite('img_data/left_image_'+str(index)+'.jpg', frame1)
-                cv2.imwrite('img_data/right_image_'+str(index)+'.jpg', frame2)
-                index += 1
-
-        #take a delayed picture, 
-        if keyEvent == ord('d'):
-                start = time()
-                while time()- start <= delay:
-                        ret1, frame1 = cam1.read()
-                        ret2, frame2 = cam2.read()
-                        cv2.imshow('FRAMOS1',frame1)
-                        cv2.imshow('FRAMOS2', frame2)
-                        cv2.moveWindow('FRAMOS1', 0, 250)
-                        cv2.moveWindow('FRAMOS2', 1100, 250)
-
-                cv2.imwrite('img_data/left_image_'+str(index)+'.jpg', frame1)
-                cv2.imwrite('img_data/right_image_'+str(index)+'.jpg', frame2)
-                index += 1
 
         if keyEvent==ord('q'):
                 break
 
 #close video capture object and close opencv window   
 cam1.release()
-cam2.release()
+#cam2.release()
 cv2.destroyAllWindows()
