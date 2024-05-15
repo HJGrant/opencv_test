@@ -12,7 +12,7 @@ def __gstreamer_pipeline_no_extras(
         flip_method=0,
     ):
     return (
-            "nvarguscamerasrc sensor-id=%d sensor-mode=%d buffer-list=True ! "
+            "nvarguscamerasrc sensor-id=%d sensor-mode=%d buffer-list=True blocksize=12609120 ! "       #12609120
             "video/x-raw(memory:NVMM), "
             "width=(int)%d, height=(int)%d,"
             "format=(string)NV12 ! "

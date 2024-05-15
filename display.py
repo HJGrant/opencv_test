@@ -34,6 +34,8 @@ if not cam2.isOpened():
 
 #get rectification maps
 maps_left_cam, maps_right_cam, ROI1, ROI2 = stereo_rectification_calibrated()
+print(maps_left_cam)
+print(maps_right_cam)
 
 while True:
     ret1, frame1 = cam1.read()
@@ -49,10 +51,13 @@ while True:
     #remap images based on the maps recieved from stereoRectify() and initUndistortRectifyMap() from stereo_rectification_calibrated()
     left_frame_rectified = cv2.remap(frame1, maps_left_cam[0], maps_left_cam[1], cv2.INTER_LANCZOS4)
     right_frame_rectified = cv2.remap(frame2, maps_right_cam[0], maps_right_cam[1], cv2.INTER_LANCZOS4)
-
+ 
     #set the ROI for both images
     #left_frame_rectified = left_frame_rectified[ROI1[1]:ROI1[3], ROI1[0]:ROI1[2]] #minus 1 to set shape to same dimensions TODO: solve this better
     #right_frame_rectified = right_frame_rectified[ROI2[1]:ROI2[3], ROI2[0]:ROI2[2]]
+
+    print(left_frame_rectified.shape)
+    print(right_frame_rectified.shape)
 
     #create a depth map based on the rectified images
     #start = time.time()
@@ -60,7 +65,6 @@ while True:
     #disparity = vpi_stereo(left_frame_rectified, right_frame_rectified)
     #end = time.time()
     #print(end-start)
-
 
 
     cv2.imshow('LEFT FRAME UDIST',left_frame_rectified)
