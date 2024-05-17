@@ -31,7 +31,7 @@ def stereo_rectification_calibrated_yml():
     return maps_left_cam, maps_right_cam, ROI1, ROI2
 
 def stereo_rectification_calibrated():
-    with open("./calibration_params.yaml", 'r') as file:
+    with open("./CalibParams1805.yaml", 'r') as file:
         #load the parameters form the yaml file created with matlab
         data = yaml.load(file)
         
@@ -45,7 +45,7 @@ def stereo_rectification_calibrated():
 
         R1, R2, P1, P2, Q, ROI1, ROI2 = cv2.stereoRectify(leftCameraMatrix, distCoeffsLeft, 
                                                     rightCameraMatrix, distCoeffsRight, 
-                                                    (1920, 1080), R, T, 1, newImageSize=(1920, 1080) )
+                                                    (1920, 1080), R, T, 1)
         
         maps_left_cam = []
         maps_right_cam = []
