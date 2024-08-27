@@ -24,12 +24,12 @@ def display_stereo_images(side_by_side_img):
 #get rectification maps
 maps_left_cam, maps_right_cam, ROI1, ROI2 = stereo_rectification_calibrated()
 
-frame2 = cv2.imread("left.jpg", cv2.IMREAD_GRAYSCALE)
-frame1 = cv2.imread("right.jpg", cv2.IMREAD_GRAYSCALE)
+frame2 = cv2.imread("frame_0065_right.png", cv2.IMREAD_GRAYSCALE)
+frame1 = cv2.imread("frame_0065_left.png", cv2.IMREAD_GRAYSCALE)
 
 h1, w1 = frame1.shape
 h2, w2 = frame2.shape
-H1, H2 = stereo_rectification_uncalibrated(frame2, frame1)
+H1, H2 = stereo_rectification_uncalibrated(frame1, frame2)
 
 #remap images based on the maps recieved from stereoRectify() and initUndistortRectifyMap() from stereo_rectification_calibrated()
 left_frame_rectified = cv2.remap(frame1, maps_left_cam[0], maps_left_cam[1], cv2.INTER_LANCZOS4)
@@ -60,11 +60,12 @@ side_by_side_img_with_lines = draw_horizontal_lines(side_by_side_img)
 disp_uncalib = depth_map(left_frame_rectified_uncalib, right_frame_rectified_uncalib)
 disparity = depth_map(left_frame_rectified, right_frame_rectified)
 
+filtered_disparity = cv2.bilateralFilter(disparity, d=3, sigmaColor=150, sigmaSpace=125)
 
 cv2.imshow('stereo_rectified',side_by_side_img_with_lines)
 #cv2.imshow('stereo_uncalib', stereo_uncalib_w_lines)
 #cv2.imshow("disp_uncalib", disp_uncalib)
-cv2.imshow('DISPARITY', disparity)
+cv2.imshow('DISPARITY', filtered_disparity)
 cv2.moveWindow('stereo_rectified', 100, 250)
 cv2.moveWindow('DISPARITY', 100, 950)
 

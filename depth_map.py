@@ -3,17 +3,17 @@ import numpy as np
 
 
 def depth_map(img1, img2):
-    block_size = 11
+    block_size = 8
     min_disp = -128
     max_disp = 128
 
     num_disp = max_disp - min_disp
 
-    uniquenessRatio = 5
+    uniquenessRatio = 3
 
-    speckleWindowSize = 200
+    speckleWindowSize = 75
 
-    speckleRange = 2
+    speckleRange = 75
     disp12MaxDiff = 0
 
     stereo = cv2.StereoSGBM_create(
@@ -24,8 +24,8 @@ def depth_map(img1, img2):
        speckleWindowSize=speckleWindowSize,
        speckleRange=speckleRange,
        disp12MaxDiff=disp12MaxDiff,
-       P1=8 * 1 * block_size * block_size, 
-       P2=32 * 1 * block_size * block_size
+       P1=98 * 1 * block_size * block_size, 
+       P2=120 * 1 * block_size * block_size
     )   
 
     disparity_SGBM = stereo.compute(img1, img2) 
